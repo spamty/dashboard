@@ -2,20 +2,7 @@
 
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">API Errors</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group mr-2">
-           <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-           </button>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary">Filter</button>
-        </div>
       </div>
-
-
-
-<pre><code>SELECT * FROM `tracking` WHERE `statusReturned` != '1' AND `statusReturned` != '200'</code></pre>
 
 <?php
 
@@ -27,22 +14,31 @@ catch(PDOException $e){ exit("Error while connecting to database."); }
 
 // prepare search query
 $dbSearchQuery = "SELECT * FROM `tracking` WHERE `statusReturned` != '1' AND `statusReturned` != '200'";
-if( !empty($_GET['api'])){ $dbSearchQuery=$dbSearchQuery." AND `api` = :api"; }
-if( !empty($_POST['version'])){ $dbSearchQuery=$dbSearchQuery." AND `version` = :version"; }
-if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `user` = :user"; }
-if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `IP` = :IP"; }
-if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `statusReturned` = :status"; }
-print_r($dbSearchQuery);
+$dbExecData = array();
+if( !empty($_POST['api'])){ 
+	$dbSearchQuery=$dbSearchQuery." AND `api` = :api"; 
+	$dbExecData[":api"] = $_POST['api'];
+}
+if( !empty($_POST['version'])){ 
+	$dbSearchQuery=$dbSearchQuery." AND `version` = :version"; 
+	$dbExecData[":version"] = $_POST['version'];
+}
+if( !empty($_POST['user'])){ 
+	$dbSearchQuery=$dbSearchQuery." AND `user` = :user"; 
+	$dbExecData[":user"] = $_POST['user'];
+}
+if( !empty($_POST['IP'])){ 
+	$dbSearchQuery=$dbSearchQuery." AND `IP` = :IP"; 
+	$dbExecData[":IP"] = $_POST['IP'];
+}
+if( !empty($_POST['status'])){ 
+	$dbSearchQuery=$dbSearchQuery." AND `statusReturned` = :status"; 
+	$dbExecData[":status"] = $_POST['status'];
+}
+$dbSearchQuery=$dbSearchQuery." ORDER BY `date` DESC, `time` DESC"; 
 
 // get data from db
 $dbQuery = $db->prepare($dbSearchQuery);
-$dbExecData = array(
-	":api" => $_GET['api'],
-	":version" => $_POST['version'],
-	":user" => $_POST['user'],
-	":IP" => $_POST['IP'],
-	":status" => $_POST['status']
-);
 $dbQuery->execute($dbExecData);
 $dbD = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
 
@@ -68,15 +64,15 @@ if( empty($dbD) ){ echo "No data found in database."; }
           </thead>
           <tbody>
             <tr>
-	      <form>
+	      <form action="errors.php" method="post">
               <td>-</td>
               <td>-</td>
-              <td><input type="text" class="form-control form-control-sm" placeholder="api"></td>
-              <td><input type="text" class="form-control form-control-sm" placeholder="version"></td>
-              <td><input type="text" class="form-control form-control-sm" placeholder="user"></td>
-              <td><input type="text" class="form-control form-control-sm" placeholder="IP"></td>
-              <td><input type="text" class="form-control form-control-sm" placeholder="status"></td>
-              <td><input type="submit" class="btn btn-sm btn-outline-secondary" value="Filter"></td>
+              <td><input type="text" name="api" class="form-control form-control-sm" placeholder="api" value="<?php echo $_POST['api']; ?>"></td>
+              <td><input type="text" name="version" class="form-control form-control-sm" placeholder="version" value="<?php echo $_POST['version']; ?>"></td>
+              <td><input type="text" name="user" class="form-control form-control-sm" placeholder="user" value="<?php echo $_POST['user']; ?>"></td>
+              <td><input type="text" name="IP" name="status" class="form-control form-control-sm" placeholder="IP" value="<?php echo $_POST['IP']; ?>"></td>
+              <td><input type="text" name="status" class="form-control form-control-sm" placeholder="status" value="<?php echo $_POST['status']; ?>"></td>
+              <td><input type="submit" name="submit" class="btn btn-sm btn-outline-secondary" value="Filter"></td>
               </form>
             </tr>
 
