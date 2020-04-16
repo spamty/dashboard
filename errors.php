@@ -17,10 +17,41 @@
 
 <pre><code>SELECT * FROM `tracking` WHERE `statusReturned` != '1' AND `statusReturned` != '200'</code></pre>
 
+<?php
 
+// get connection details
+require_once dirname(__FILE__)."/../dbconnect/readonly.php";
+// connect to mysql db
+try{ $db = new PDO('mysql:host='.MYSQLHOST.';dbname=spamty_api', MYSQLUSER, MYSQLPASS); }
+catch(PDOException $e){ exit("Error while connecting to database."); }
 
+// prepare search query
+$dbSearchQuery = "SELECT * FROM `tracking` WHERE `statusReturned` != '1' AND `statusReturned` != '200'";
+if( !empty($_GET['api'])){ $dbSearchQuery=$dbSearchQuery." AND `api` = :api"; }
+if( !empty($_POST['version'])){ $dbSearchQuery=$dbSearchQuery." AND `version` = :version"; }
+if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `user` = :user"; }
+if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `IP` = :IP"; }
+if( !empty($_POST['user'])){ $dbSearchQuery=$dbSearchQuery." AND `statusReturned` = :status"; }
+print_r($dbSearchQuery);
 
+// get data from db
+$dbQuery = $db->prepare($dbSearchQuery);
+$dbExecData = array(
+	":api" => $_GET['api'],
+	":version" => $_POST['version'],
+	":user" => $_POST['user'],
+	":IP" => $_POST['IP'],
+	":status" => $_POST['status']
+);
+$dbQuery->execute($dbExecData);
+$dbD = $dbQuery->fetchAll(PDO::FETCH_ASSOC);
 
+// The db data we get:  $dbD = 
+//  Array ( [0] => Array ( [api] => D [version] => 5 [user] => d_441230 [apiKey] => 9d7dde843523476f1f3d7de92 [date] => 20190430 [time] => 193816 [IP] => 678.123.345.000 [statusReturned] => 0 [detailsReturned] => Invalid value for k. [additional] => ) [1] => Array... )
+
+if( empty($dbD) ){ echo "No data found in database."; }
+
+?>
       <div class="table-responsive">
         <table class="table table-striped table-sm">
           <thead>
@@ -32,7 +63,7 @@
               <th>user</th>
               <th>IP</th>
               <th>status</th>
-              <th>statusDetails</th>
+              <th>detailsReturned</th>
             </tr>
           </thead>
           <tbody>
@@ -48,26 +79,23 @@
               <td><input type="submit" class="btn btn-sm btn-outline-secondary" value="Filter"></td>
               </form>
             </tr>
+
+<?php
+  foreach ( $dbD as $dbValue ){ 
+?>
             <tr>
-              <td>1,001</td>
-              <td>Lorem</td>
-              <td>ipsum</td>
-              <td>dolor</td>
-              <td>dolor</td>
-              <td>dolor</td>
-              <td>sit</td>
-              <td>dolor</td>
+              <td><?php echo $dbValue['date']; ?></td>
+              <td><?php echo $dbValue['time']; ?></td>
+              <td><?php echo $dbValue['api']; ?></td>
+              <td><?php echo $dbValue['version']; ?></td>
+              <td><?php echo $dbValue['user']; ?></td>
+              <td><?php echo $dbValue['IP']; ?></td>
+              <td><?php echo $dbValue['statusReturned']; ?></td>
+              <td><?php echo $dbValue['detailsReturned']; ?></td>
             </tr>
-            <tr>
-              <td>1,002</td>
-              <td>amet</td>
-              <td>consectetur</td>
-              <td>adipiscing</td>
-              <td>dolor</td>
-              <td>dolor</td>
-              <td>dolor</td>
-              <td>elit</td>
-            </tr>
+<?php
+  }
+?>
 
           </tbody>
         </table>
