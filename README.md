@@ -1,6 +1,6 @@
 # Spamty Dashboard
 
-[![Open Issues](https://img.shields.io/bitbucket/issues/spamty/dashboard.svg)](https://bitbucket.org/spamty/dashboard/issues?status=open)
+[![Open Issues](https://img.shields.io/github/issues/spamty/dashboard)](https://github.com/spamty/dashboard/issues)
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/spamty?style=social)](https://twitter.com/Spamty) 
 [![Mastodon Follow](https://img.shields.io/static/v1?label=@spamty@fosstodon.org&message=%20&style=social&logo=mastodon)](https://fosstodon.org/@spamty) 
@@ -18,7 +18,7 @@ This is our admin dashboard for statistics and tracking.
 
 ## Issues & Bugs
 
-Report issues and bugs [on Bitbucket](https://bitbucket.org/spamty/dashboard/issues)
+Report issues and bugs [on Bitbucket](https://github.com/spamty/dashboard/issues)
 or [send me an email](https://3q3.de/spamty).
 
 ## License
